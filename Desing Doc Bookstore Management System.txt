@@ -1,0 +1,276 @@
+create a "Bookstore Management System".
+ This system will manage books, authors, and orders, 
+ and will include features like user authentication, microservices architecture, 
+ RESTful APIs, MongoDB integration, file upload/download, 
+ WebSockets for real-time updates, caching, postgreSQL, GraphQL and integration testing. 
+ 
+ Project Overview
+ ==================
+ The Bookstore Management System will consist of several microservices,
+ each responsible for a specific domain. 
+ The main components are: 
+ 1. User Service: Manages user registration, authentication, and authorization. 
+ 2. Book Service: Manages book information and CRUD operations. 
+ 3. Order Service: Handles order creation, updates, and status tracking. 
+ 4. Notification Service: Sends notifications to users about their orders. 
+ 5. Gateway Service: Acts as an API gateway for routing requests to appropriate services. 
+ 6. Config Server: Centralized configuration management.
+ 7. Discovery Service: Service registry for microservices. 
+ 
+ Detailed Design Document ============================ 
+ # 1. User Service
+ - Technologies: Spring Boot, Spring Security, JWT, PostgreSQL 
+ - Endpoints: 
+	- `POST /register`: Register a new user. 
+	- `POST /login`: Authenticate a user and return a JWT. 
+	- `GET /users/{id}`: Get user details (secured endpoint). 
+	
+ # 2. Book Service 
+ - Technologies: Spring Boot, Spring Data JPA, PostgreSQL 
+ - Endpoints: 
+	- `POST /books`: Add a new book. 
+	- `GET /books`: Retrieve all books with pagination and sorting. 
+	- `GET /books/{id}`: Get details of a specific book. 
+	- `PUT /books/{id}`: Update book information. 
+	- `DELETE /books/{id}`: Delete a book. 
+ # 3. Order Service 
+ - Technologies: Spring Boot, Spring Data MongoDB, MongoDB 
+ - Endpoints: - `POST /orders`: Create a new order. 
+	- `GET /orders`: Retrieve all orders. 
+	- `GET /orders/{id}`: Get details of a specific order. 
+	- `PUT /orders/{id}`: Update order status. 
+ # 4. Notification Service 
+ - Technologies: Spring Boot, Kafka 
+ - Endpoints:
+	- `POST /notifications`: Send a notification (internal use). 
+ # 5. Gateway Service 
+ - Technologies: Spring Boot, Spring Cloud Gateway 
+ - Responsibilities: 
+	- Route requests to appropriate microservices. 
+	- Handle cross-cutting concerns like security and monitoring. 
+ # 6. Config Server 
+ - Technologies: Spring Boot, Spring Cloud Config
+ - Responsibilities: 
+	- Provide centralized configuration for all microservices. 
+ # 7. Discovery Service 
+ - Technologies: Spring Boot, Netflix Eureka 
+ - Responsibilities: - Register and discover microservices. 
+ 
+ **********************
+ Additional Features 
+ # File Upload and Download 
+ - Book Service will handle file uploads for book covers. 
+ - Endpoints: 
+	- `POST /books/{id}/cover`: Upload a book cover. 
+	- `GET /books/{id}/cover`: Download a book cover. 
+# WebSockets for Real-Time Updates 
+- Order Service will use WebSockets to notify users of order status updates in real-time. 
+# Caching 
+- Implement caching in Book Service using Redis to cache frequently accessed book data. 
+# GraphQL 
+- Add a GraphQL endpoint in Book Service to fetch book and author details. 
+# Integration Testing 
+- Write integration tests for all services using JUnit and Spring Test. 
+- Mock external services using MockMvc. 
+
+
+Project Structure 
+	bookstore-management-system/ 
+	├── config-server/ 
+	├── discovery-service/ 
+	├── gateway-service/ 
+	├── user-service/ 
+	├── book-service/ 
+	├── order-service/ 
+	├── notification-service/ 
+	└── README.md
+------------------------------------------------------------------------------------------------ 
+Sample JSON representations for the models in the Bookstore Management System: 
+================================================================================= 
+1. User Model json 
+{
+    "id": 1,
+    "username": "john_doe",
+    "password": "hashed_password",
+    "email": "john.doe@example.com",
+    "roles": [
+        "ROLE_USER",
+        "ROLE_ADMIN"
+    ]
+}
+2. Book Model json 
+{
+    "id": 101,
+    "title": "Spring Boot in Action",
+    "author": "Craig Walls",
+    "isbn": "9781617292545",
+    "price": 45.99,
+    "coverUrl": "http://example.com/covers/spring-boot-in-action.jpg",
+    "publishedDate": "2016-01-01",
+    "description": "A comprehensive guide to Spring Boot."
+} 
+3. Order Model json 
+{
+    "id": 1001,
+    "userId": 1,
+    "orderDate": "2024-12-30T10:15:30",
+    "status": "PROCESSING",
+    "items": [
+        {
+            "bookId": 101,
+            "quantity": 2,
+            "price": 45.99
+        },
+        {
+            "bookId": 102,
+            "quantity": 1,
+            "price": 39.99
+        }
+    ],
+    "totalAmount": 131.97
+}
+4. Notification Model json 
+{
+    "id": 5001,
+    "userId": 1,
+    "message": "Your order #1001 has been shipped.",
+    "timestamp": "2024-12-30T12:00:00"
+} 
+5. GraphQL Schema for Book and Author graphql type Book 
+type Book {
+  id: ID!
+  title: String!
+  author: Author!
+  isbn: String!
+  price: Float!
+  coverUrl: String
+  publishedDate: String
+  description: String
+}
+
+type Author {
+  id: ID!
+  name: String!
+  books: [Book!]
+}
+
+type Query {
+  books: [Book!]
+  book(id: ID!): Book
+  authors: [Author!]
+  author(id: ID!): Author
+}
+ 
+6. WebSocket Message for Order Updates json 
+{
+    "orderId": 1001,
+    "status": "SHIPPED",
+    "timestamp": "2024-12-30T12:00:00"
+} 
+
+validation rules for the models in the Bookstore Management System: 
+====================================================================== 
+1. User Model 
+- username: 
+	- Required 
+	- Minimum length: 3 characters 
+	- Maximum length: 50 characters 
+	- Must be unique 
+- password: 
+	- Required 
+	- Minimum length: 8 characters 
+	- Must include at least one uppercase letter, one lowercase letter, one digit, and one special character 
+- email: 
+	- Required 
+	- Must be a valid email format -
+	Must be unique 
+- roles: 
+	- Required 
+	- Must contain at least one role 
+2. Book Model 
+- title: 
+	- Required 
+	- Minimum length: 1 character 
+	- Maximum length: 255 characters 
+- author: 
+	- Required 
+	- Minimum length: 1 character 
+	- Maximum length: 255 characters 
+- isbn: 
+	- Required - Must be a valid ISBN format (e.g., ISBN-10 or ISBN-13) 
+	- Must be unique
+- price: 
+	- Required 
+	- Must be a positive number 
+- coverUrl: 
+	- Optional 
+	- Must be a valid URL format 
+- publishedDate: 
+	- Optional 
+	- Must be a valid date format (e.g., YYYY-MM-DD) 
+- description: 
+	- Optional 
+	- Maximum length: 2000 characters 
+3. Order Model 
+- userId: 
+	- Required 
+	- Must reference an existing user 
+- orderDate: 
+	- Required 
+	- Must be a valid date-time format (e.g., ISO 8601) 
+- status: 
+	- Required 
+	- Must be one of the predefined statuses (e.g., "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED")
+- items: 
+	- Required - Must contain at least one item 
+	- Each item must have: 
+- bookId: 
+	-Required, must reference an existing book 
+- quantity: 
+	-Required, must be a positive integer 
+- price: 
+	-Required, must be a positive number 
+- totalAmount: 
+	- Required 
+	- Must be a positive number 
+	- Must equal the sum of the prices of all items 
+4. Notification Model 
+- userId: 
+	- Required 
+	- Must reference an existing user 
+- message: 
+	- Required 
+	- Minimum length: 1 character 
+	- Maximum length: 500 characters 
+- timestamp: 
+	- Required 
+	- Must be a valid date-time format (e.g., ISO 8601) 
+5. GraphQL Schema for Book and Author 
+- Book: 
+	- id: Required, must be unique 
+	- title: Required, minimum length: 1 character, maximum length: 255 characters 
+	- author: Required, must reference an existing author 
+	- isbn: Required, must be a valid ISBN format, must be unique 
+	- price: Required, must be a positive number - coverUrl: Optional, must be a valid URL format 
+	- publishedDate: Optional, must be a valid date format - description: Optional, maximum length: 2000 characters 
+- Author: 
+- id: 
+	- Required, 
+	- must be unique 
+- name: 
+	- Required, 
+	- minimum length: 1 character, 
+	- maximum length: 255 characters 
+- books: 
+		- Optional, 
+		- must reference existing books 
+6. WebSocket Message for Order Updates 
+	- orderId: 
+		- Required 
+		- Must reference an existing order 
+	- status: 
+		- Required 
+		- Must be one of the predefined statuses (e.g., "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED") 
+	- timestamp: 
+		- Required 
+		- Must be a valid date-time format (e.g., ISO 8601
